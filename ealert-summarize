@@ -123,12 +123,12 @@ def main():
         for dname, dstats in sorted(obj['domains'].items(), reverse=True, key=lambda x: x[1]['rcpts']):
             if dstats['msgs'] > 0:
                 dstats['time_avg_msg'] = dstats['time'] / dstats['msgs']
-                dstats['time_avg_rcpt'] = dstats['time'] / dstats['rcpts']
+                dstats['time_avg_rcpt'] = dstats['time'] / (dstats['rcpts'] or 1)
             if dstats['rcpts'] > 50:
                 print(dname + ':')
                 print('    Total: {}'.format(dstats['rcpts']))
-                print('    Average time per transaction: {} ms'.format(dstats['time_avg_msg']))
-                print('    Average time per recipient: {} ms'.format(dstats['time_avg_rcpt']))
+                print('    Average time per transaction: {:.2f} seconds'.format(dstats['time_avg_msg'] / 1000))
+                print('    Average time per recipient: {:.2f} seconds'.format(dstats['time_avg_rcpt'] / 1000))
                 print('    Per minute:')
                 for ts, count in sorted(dstats['histogram'].items(), key=lambda x: x[0]):
                     print('        {}: {}'.format(ts, count))
