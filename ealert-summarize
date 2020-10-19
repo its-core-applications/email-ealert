@@ -22,6 +22,7 @@ def incr_stat(stats, statname, amount=1):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('jsondir')
+    parser.add_argument('-r', '--raw', action='store_true')
     args = parser.parse_args()
 
     basedir = os.path.abspath(args.jsondir)
@@ -98,6 +99,8 @@ def main():
                             incr_stat(dstats, 'msgs', int(m['rcpt_a']))
                             incr_stat(dstats['histogram'], endts[11:16], int(m['rcpt_a']))
 
+
+    # Pretty output
     for cksum, obj in sorted(messages.items(), key=lambda x: x[1]['receive_recipients']):
         print('Subject: ' + obj['subject'])
         print('Start: ' + obj['receive_start'][:19])
@@ -124,6 +127,8 @@ def main():
                     print('        {}: {}'.format(ts, count))
                 print('')
 
+        if args.raw:
+            print(json.dumps(obj, indent=2))
 
 if __name__ == '__main__':
     main()
