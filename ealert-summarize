@@ -96,8 +96,10 @@ def main():
 
                             incr_stat(stats['deliver_histogram'], endts[11:16], int(m['rcpt_a']))
                             incr_stat(stats, 'deliver_recipients', int(m['rcpt_a']))
-                            incr_stat(dstats, 'msgs', int(m['rcpt_a']))
+                            incr_stat(dstats, 'msgs', int(m['msg_a']))
+                            incr_stat(dstats, 'rcpts', int(m['rcpt_a']))
                             incr_stat(dstats['histogram'], endts[11:16], int(m['rcpt_a']))
+                            incr_stat(dstats, 'time', int(m['time']))
 
 
     # Pretty output
@@ -118,10 +120,15 @@ def main():
         for ts, count in sorted(obj['deliver_histogram'].items(), key=lambda x: x[0]):
             print('    {}: {}'.format(ts, count))
         print('')
-        for dname, dstats in sorted(obj['domains'].items(), reverse=True, key=lambda x: x[1]['msgs']):
-            if dstats['msgs'] > 250:
+        for dname, dstats in sorted(obj['domains'].items(), reverse=True, key=lambda x: x[1]['rcpts']):
+            if dstats['msgs'] > 0:
+                dstats['time_avg_msg'] = dstats['time'] / dstats['msgs']
+                dstats['time_avg_rcpt'] = dstats['time'] / dstats['rcpts']
+            if dstats['rcpts'] > 50:
                 print(dname + ':')
-                print('    Total: {}'.format(dstats['msgs']))
+                print('    Total: {}'.format(dstats['rcpts']))
+                print('    Average time per transaction: {} ms'.format(dstats['time_avg_msg']))
+                print('    Average time per recipient: {} ms'.format(dstats['time_avg_rcpt']))
                 print('    Per minute:')
                 for ts, count in sorted(dstats['histogram'].items(), key=lambda x: x[0]):
                     print('        {}: {}'.format(ts, count))
