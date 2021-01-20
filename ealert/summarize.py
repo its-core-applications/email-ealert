@@ -7,7 +7,6 @@ import os
 from .util import (
     re_accepted,
     re_baduser,
-    re_delivery,
     re_message,
     re_queue,
 )
@@ -101,7 +100,6 @@ def main():
                             incr_stat(dstats['histogram'], endts[11:16], int(m['rcpt_a']))
                             incr_stat(dstats, 'time', int(m['time']))
 
-
     # Pretty output
     for cksum, obj in sorted(messages.items(), key=lambda x: x[1]['receive_recipients']):
         print('Subject: ' + obj['subject'])
@@ -136,6 +134,7 @@ def main():
 
         if args.raw:
             print(json.dumps(obj, indent=2))
+
 
 if __name__ == '__main__':
     main()

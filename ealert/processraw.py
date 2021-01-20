@@ -75,7 +75,6 @@ def main():
                     mobj['egress'][pid] = obj
 
     print(json.dumps(messages, indent=2))
-    #for cksum, obj in sorted(messages.items(), key=lambda x: len(x[1]['pids'])):
 
 
 if __name__ == '__main__':
