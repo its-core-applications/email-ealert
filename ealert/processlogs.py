@@ -8,7 +8,7 @@ import sys
 
 import zstandard as zstd
 
-from ealert_util import (
+from .util import (
     re_child,
     re_cksum,
     re_from,

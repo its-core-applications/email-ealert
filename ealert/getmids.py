@@ -4,7 +4,7 @@ import argparse
 import json
 import os
 
-from ealert_util import re_delivery
+from .util import re_delivery
 
 
 def main():
