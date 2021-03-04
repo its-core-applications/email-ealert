@@ -72,15 +72,15 @@ def main():
                 # Delivery stats
                 for pid, cobj in obj['egress'].items():
                     startts = cobj['lines'][0][:32]
-                    endts = cobj['lines'][-1][:32]
                     if startts < stats.get('deliver_start', 'A'):
                         stats['deliver_start'] = startts
-                    if endts > stats.get('deliver_end', '0'):
-                        stats['deliver_end'] = endts
 
                     for line in cobj['lines']:
                         m = re_queue.match(line)
                         if m:
+                            endts = line[:32]
+                            if (m['msg_a'] != '0') and (endts > stats.get('deliver_end', '0')):
+                                stats['deliver_end'] = endts
                             if m['domain'] not in stats['domains']:
                                 stats['domains'][m['domain']] = {
                                     'start': startts,
