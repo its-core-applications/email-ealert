@@ -7,7 +7,7 @@ import re
 re_from = re.compile(r'.+: Receive \[(?P<ip>[\.0-9]+)\] (?P<hostname>.+\.raveu\.com):.+RFC5322.From: (?P<addr>.+)')
 
 re_pid = re.compile(r'(?P<ts>.+) .+\.umich\.edu simta\[(?P<pid>[\.0-9]+)\]:')
-re_stale = re.compile(r'.+: Child: .+ process (?P<child_pid>[\.0-9]+) .+ exited 0')
+re_stale = re.compile(r'.+: Child: .+ (process|runner) (?P<child_pid>[\.0-9]+) .+ exited 0')
 re_cksum = re.compile(r'.+: Message checksums: [0-9a-z]+ (?P<cksum>[0-9a-z]+)')
 re_subj = re.compile(r'.+: Subject: (?P<subj>.+)')
 re_child = re.compile(r'.+: Child: launched queue runner (?P<child_pid>[\.0-9]+)')

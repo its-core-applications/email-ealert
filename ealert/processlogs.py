@@ -32,6 +32,7 @@ def main():
 
     pids = {}
     pid_lines = {}
+    partial_pids = {}
 
     mids = []
     if args.type != 'mx':
@@ -58,9 +59,25 @@ def main():
 
             pid_lines[pid].append(line)
 
+            if partial_pids:
+                parent_pid = partial_pids.pop(pid.split('.')[0], None)
+                if parent_pid:
+                    pids[pid] = {
+                        'parent': parent_pid,
+                        'lines': pid_lines[pid],
+                    }
+
             m = re_stale.match(line)
             if m:
-                pid_lines.pop(m.group('child_pid'), None)
+                if '.' in m.group('child_pid'):
+                    # We have the complete PID/CID
+                    pid_lines.pop(m.group('child_pid'), None)
+                else:
+                    # simta now only logs the plain PID for child management
+                    for key in list(pid_lines.keys()):
+                        if key.startswith(m.group('child_pid') + '.'):
+                            del pid_lines[key]
+                            break
                 continue
 
             if pid not in pids:
@@ -86,10 +103,14 @@ def main():
             # Capture children of tracked PIDs
             m = re_child.match(line)
             if m:
-                pids[m.group('child_pid')] = {
-                    'parent': pid,
-                    'lines': pid_lines[pid],
-                }
+                if '.' not in m.group('child_pid'):
+                    # simta now only logs the plain PID of children
+                    partial_pids[m.group('child_pid')] = pid
+                else:
+                    pids[m.group('child_pid')] = {
+                        'parent': pid,
+                        'lines': pid_lines[m.group('child_pid')],
+                    }
                 continue
 
             # Next, check for some receipt metadata we want to track
