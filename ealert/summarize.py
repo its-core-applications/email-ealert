@@ -118,6 +118,8 @@ def main():
         for ts, count in sorted(obj['deliver_histogram'].items(), key=lambda x: x[0]):
             print('    {}: {}'.format(ts, count))
         print('')
+        print('Domains with >50 recipients:')
+        print('')
         for dname, dstats in sorted(obj['domains'].items(), reverse=True, key=lambda x: x[1]['rcpts']):
             if dstats['msgs'] > 0:
                 dstats['time_avg_msg'] = dstats['time'] / dstats['msgs']
