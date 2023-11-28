@@ -102,21 +102,21 @@ def main():
 
     # Pretty output
     for cksum, obj in sorted(messages.items(), key=lambda x: x[1]['receive_recipients']):
-        print('Subject: ' + obj['subject'])
-        print('Start: ' + obj['receive_start'][:19])
-        print('Receipt End: ' + obj['receive_end'][:19])
-        print('Delivery End: ' + obj['deliver_end'][:19])
-        print('Accepted: {}'.format(obj['receive_recipients']))
-        print('Delivered: {}'.format(obj['deliver_recipients']))
-        print('Bad Addresses: {}'.format(obj.get('receive_badusers', 0)))
+        print(f'Subject: {obj["subject"]}')
+        print(f'Start: {obj["receive_start"][:19]}')
+        print(f'Receipt End: {obj["receive_end"][:19]}')
+        print(f'Delivery End: {obj["deliver_end"][:19]}')
+        print(f'Accepted: {obj["receive_recipients"]}')
+        print(f'Delivered: {obj["deliver_recipients"]}')
+        print(f'Bad Addresses: {obj.get("receive_badusers", 0)}')
         print('')
         print('Received messages per minute:')
         for ts, count in sorted(obj['receive_histogram'].items(), key=lambda x: x[0]):
-            print('    {}: {}'.format(ts, count))
+            print(f'    {ts}: {count}')
         print('')
         print('Delivered messages per minute:')
         for ts, count in sorted(obj['deliver_histogram'].items(), key=lambda x: x[0]):
-            print('    {}: {}'.format(ts, count))
+            print(f'    {ts}: {count}')
         print('')
         print('Domains with >50 recipients:')
         print('')
@@ -126,12 +126,12 @@ def main():
                 dstats['time_avg_rcpt'] = dstats['time'] / (dstats['rcpts'] or 1)
             if dstats['rcpts'] > 50:
                 print(dname + ':')
-                print('    Total: {}'.format(dstats['rcpts']))
-                print('    Average time per transaction: {:.2f} seconds'.format(dstats['time_avg_msg'] / 1000))
-                print('    Average time per recipient: {:.2f} seconds'.format(dstats['time_avg_rcpt'] / 1000))
+                print(f'    Total: {dstats["rcpts"]}')
+                print(f'    Average time per transaction: {dstats["time_avg_msg"] / 1000:.2f} seconds')
+                print(f'    Average time per recipient: {dstats["time_avg_rcpt"] / 1000:.2f} seconds')
                 print('    Per minute:')
                 for ts, count in sorted(dstats['histogram'].items(), key=lambda x: x[0]):
-                    print('        {}: {}'.format(ts, count))
+                    print(f'        {ts}: {count}')
                 print('')
 
         if args.raw:
