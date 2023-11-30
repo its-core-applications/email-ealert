@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import itertools
 import json
 import os
+
+from datetime import datetime
 
 from .util import (
     re_accepted,
@@ -16,6 +19,24 @@ def incr_stat(stats, statname, amount=1):
     if statname not in stats:
         stats[statname] = 0
     stats[statname] += amount
+
+
+def merge_stats(s1, s2):
+    for k, v in s2.items():
+        if k not in s1:
+            s1[k] = v
+        else:
+            if type(v) == int:
+                s1[k] += v
+
+            elif type(v) == dict:
+                merge_stats(s1[k], s2[k])
+
+            elif k.endswith('start'):
+                s1[k] = min(s1[k], v)
+
+            elif k.endswith('end'):
+                s1[k] = max(s1[k], v)
 
 
 def main():
@@ -99,6 +120,43 @@ def main():
                             incr_stat(dstats, 'rcpts', int(m['rcpt_a']))
                             incr_stat(dstats['histogram'], endts[11:16], int(m['rcpt_a']))
                             incr_stat(dstats, 'time', int(m['time']))
+
+    # Merge overlapping alerts with the same subject
+    changed = True
+    while changed:
+        changed = False
+        for cksum1 in list(messages.keys()):
+            obj1 = messages.get(cksum1)
+            if not obj1:
+                # already merged
+                continue
+
+            for cksum2, obj2 in list(messages.items()):
+                if (obj1 == obj2) or (obj1['subject'] != obj2['subject']):
+                    continue
+
+                start1 = datetime.fromisoformat(obj1['receive_start'])
+                start2 = datetime.fromisoformat(obj2['receive_start'])
+                end1 = datetime.fromisoformat(obj1['receive_end'])
+                end2 = datetime.fromisoformat(obj2['receive_end'])
+
+                merge = False
+                if (start1 <= start2 <= end1) or (start2 <= start1 <= end2):
+                    # start falls within the range
+                    merge = True
+                elif (start1 <= end2 <= end1) or (start2 <= end1 <= end2):
+                    # end falls within the range
+                    merge = True
+
+                for ts_pair in itertools.product([start1, end1], [start2, end2]):
+                    if abs(ts_pair[0] - ts_pair[1]).total_seconds() < 90:
+                        # close enough
+                        merge = True
+
+                if merge:
+                    changed = True
+                    merge_stats(obj1, obj2)
+                    messages.pop(cksum2)
 
     # Pretty output
     for cksum, obj in sorted(messages.items(), key=lambda x: x[1]['receive_recipients']):
