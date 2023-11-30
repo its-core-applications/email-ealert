@@ -42,6 +42,13 @@ def merge_stats(s1, s2):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('jsondir')
+    parser.add_argument(
+        '--min-gap',
+        action='store',
+        type=int,
+        default=600,
+        help='number of seconds before we treat a message with the same subject as belonging to a new alert',
+    )
     parser.add_argument('-r', '--raw', action='store_true')
     args = parser.parse_args()
 
@@ -149,7 +156,7 @@ def main():
                     merge = True
 
                 for ts_pair in itertools.product([start1, end1], [start2, end2]):
-                    if abs(ts_pair[0] - ts_pair[1]).total_seconds() < 90:
+                    if abs(ts_pair[0] - ts_pair[1]).total_seconds() < args.min_gap:
                         # close enough
                         merge = True
 
