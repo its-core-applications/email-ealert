@@ -43,9 +43,6 @@ def main():
                         'mids': [],
                     }
                 messages[cksum]['mx'][pid] = obj
-                obj.pop('checksum', None)
-                obj.pop('subject', None)
-                obj.pop('from', None)
 
                 for line in obj['lines']:
                     m = re_delivery.match(line)
