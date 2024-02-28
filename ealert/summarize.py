@@ -95,6 +95,7 @@ def main():
                             incr_stat(stats, 'receive_badusers')
                         elif re_message.match(line):
                             incr_stat(stats['receive_histogram'], line[11:16], rcpts)
+                            rcpts = 0
                             incr_stat(stats, 'receive_messages')
 
                 # Delivery stats
