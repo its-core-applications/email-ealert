@@ -78,7 +78,8 @@ def main():
 
                 # Receive stats
                 for pid, cobj in obj['mx'].items():
-                    incr_stat(stats['ips'], cobj['ip'])
+                    if 'ip' in cobj:
+                        incr_stat(stats['ips'], cobj['ip'])
                     startts = cobj['lines'][0][:32]
                     endts = cobj['lines'][-1][:32]
                     if startts < stats.get('receive_start', 'A'):
