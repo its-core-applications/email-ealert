@@ -7,6 +7,7 @@ import os
 from .util import (
     re_delivery,
     re_message,
+    wrap_zstd,
 )
 
 
@@ -21,10 +22,11 @@ def main():
 
     dname = os.path.join(basedir, 'mx')
     for fname in os.listdir(dname):
-        if not fname.endswith('.json'):
+        if not fname.endswith('.json') and not fname.endswith('.json.zst'):
             continue
 
-        with open(os.path.join(dname, fname), 'r') as f:
+        with open(os.path.join(dname, fname), 'rb') as f:
+            f = wrap_zstd(f, fname)
             raw = json.load(f)
             for pid, obj in raw.items():
                 mids = set()
@@ -54,10 +56,11 @@ def main():
 
     dname = os.path.join(basedir, 'egress')
     for fname in os.listdir(dname):
-        if not fname.endswith('.json'):
+        if not fname.endswith('.json') and not fname.endswith('.json.zst'):
             continue
 
-        with open(os.path.join(dname, fname), 'r') as f:
+        with open(os.path.join(dname, fname), 'rb') as f:
+            f - wrap_zstd(f, fname)
             raw = json.load(f)
 
         for pid, obj in raw.items():

@@ -12,6 +12,7 @@ from .util import (
     re_baduser,
     re_message,
     re_queue,
+    wrap_zstd,
 )
 
 
@@ -57,10 +58,11 @@ def main():
     messages = {}
 
     for fname in os.listdir(basedir):
-        if not fname.endswith('.json'):
+        if not fname.endswith('.json') and not fname.endswith('.json.zst'):
             continue
 
-        with open(os.path.join(basedir, fname), 'r') as f:
+        with open(os.path.join(basedir, fname), 'rb') as f:
+            f = wrap_zstd(f, fname)
             raw = json.load(f)
             for cksum, obj in raw.items():
                 if cksum not in messages:

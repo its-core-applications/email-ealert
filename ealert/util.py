@@ -2,6 +2,10 @@
 
 import re
 
+from io import TextIOWrapper
+
+from zstandard import ZstdDecompressor
+
 
 # This one might need tweaking in the future
 re_from = re.compile(r'.+: Receive \[(?P<ip>[\.0-9]+)\] (?P<hostname>.+\.mailgun\.net):.+RFC5322.From: (?P<addr>(?:dpss-safety-security|UMEmergency|umdearborn-emermgt)@umich.edu)')
@@ -19,3 +23,10 @@ re_accepted = re.compile(r'.+: Receive.+: To.+: Accepted$')
 re_baduser = re.compile(r'.+: Receive.+: Failed: User not local$')
 
 re_queue = re.compile(r'.+: Queue (?P<domain>.+): Delivery complete: (?P<time>[0-9]+) milliseconds, (?P<msgs>[0-9]+) messages: (?P<msg_a>[0-9]+) A (?P<msg_f>[0-9]+) F (?P<msg_t>[0-9]+) T, (?P<rcpts>[0-9]+) rcpts (?P<rcpt_a>[0-9]+) A (?P<rcpt_f>[0-9]+) F (?P<rcpt_t>[0-9]+) T')
+
+
+def wrap_zstd(f, fname):
+    if fname.endswith('.zst'):
+        f = ZstdDecompressor().stream_reader(f)
+    f = TextIOWrapper(f, encoding='utf-8', errors='backslashreplace')
+    return f

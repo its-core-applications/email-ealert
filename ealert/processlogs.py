@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
-import io
 import json
 import sys
-
-import zstandard as zstd
 
 from .util import (
     re_child,
@@ -15,6 +12,7 @@ from .util import (
     re_pid,
     re_stale,
     re_subj,
+    wrap_zstd,
 )
 
 
@@ -39,16 +37,15 @@ def main():
         if not args.midlist:
             print('Non-MX log parsing requires a MID list so that we know what to look for', file=sys.stderr)
             sys.exit(1)
-        with open(args.midlist, 'r') as f:
+        with open(args.midlist, 'rb') as f:
+            f = wrap_zstd(f, args.midlist)
             mids = json.load(f)
 
     fname = args.logfile
 
     with open(fname, 'rb') as f:
-        if fname.endswith('.zst'):
-            f = zstd.ZstdDecompressor().stream_reader(f)
-        ftext = io.TextIOWrapper(f, encoding='utf-8', errors='backslashreplace')
-        for line in ftext:
+        f = wrap_zstd(f, fname)
+        for line in f:
             m = re_pid.match(line)
             if not m:   # Not a simta log line
                 continue
