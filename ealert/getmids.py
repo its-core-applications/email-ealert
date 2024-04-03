@@ -4,7 +4,10 @@ import argparse
 import json
 import os
 
-from .util import re_delivery
+from .util import (
+    re_delivery,
+    wrap_zstd,
+)
 
 
 def main():
@@ -17,10 +20,11 @@ def main():
     messages = set()
 
     for fname in os.listdir(dname):
-        if not fname.endswith('.json'):
+        if not fname.endswith('.json') and not fname.endswith('.json.zst'):
             continue
 
         with open(os.path.join(dname, fname), 'r') as f:
+            f = wrap_zstd(f, fname)
             raw = json.load(f)
             for pid, obj in raw.items():
                 for line in obj['lines']:
