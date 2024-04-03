@@ -23,7 +23,7 @@ def main():
         if not fname.endswith('.json') and not fname.endswith('.json.zst'):
             continue
 
-        with open(os.path.join(dname, fname), 'r') as f:
+        with open(os.path.join(dname, fname), 'rb') as f:
             f = wrap_zstd(f, fname)
             raw = json.load(f)
             for pid, obj in raw.items():
