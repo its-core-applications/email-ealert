@@ -60,7 +60,7 @@ def main():
             continue
 
         with open(os.path.join(dname, fname), 'rb') as f:
-            f - wrap_zstd(f, fname)
+            f = wrap_zstd(f, fname)
             raw = json.load(f)
 
         for pid, obj in raw.items():
