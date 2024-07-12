@@ -64,8 +64,12 @@ def main():
             raw = json.load(f)
 
         for pid, obj in raw.items():
+            srcobj = obj
+            while 'parent' in srcobj:
+                srcobj = raw[srcobj['parent']]
+
             mids = []
-            for line in obj['lines']:
+            for line in srcobj['lines']:
                 m = re_message.match(line)
                 if m:
                     mids.append(m.group('env_id'))
